@@ -1,0 +1,4 @@
+thread=1
+    vel=0.0, log=1.0: time=0.01
+    vel=3: dist=0.5, time=4.0
+    vel=0.0: time=0.5
