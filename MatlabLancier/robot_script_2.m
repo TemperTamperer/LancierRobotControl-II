@@ -25,9 +25,8 @@ vel = [0, 0, 0; ...
        ]
 % [time(sec) , longitudinal velocity (m/s) , heading (rad)]
 vel2 = [0, 0, 0; ...
-        0.1, 0, -pi;
-        20.1, 0, pi;
-        40.1, 0, 0;
+        0.1, 7, 0;
+        4.1, 0, 0;
        ]
 
 vel3 = [0, 0, 0; ...

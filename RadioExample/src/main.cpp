@@ -18,21 +18,24 @@
 //#define FREQUENCY      RF69_915MHZ
 
 // Uncomment if this board is the RFM69HW/HCW not the RFM69W/CW
-//#define IS_RFM69HW_HCW
+// #define IS_RFM69HW_HCW
 
 // Serial baud rate - just used to print debug messages
 #define SERIAL_BAUD   57600
 
-// Board and radio specific config - You should not need to edit
-#if defined (__AVR_ATmega32U4__)
-#define RF69_RESET    4
-#define RF69_SPI_CS   8
-#define RF69_IRQ_PIN  7
-#elif defined(ARDUINO_SAMD_FEATHER_M0)
-#define RF69_RESET    4
-#define RF69_SPI_CS   8
-#define RF69_IRQ_PIN  3
-#endif
+//Board and radio specific config - You should not need to edit
+//#if defined (__AVR_ATmega32U4__)
+//#define RF69_RESET    4
+//#define RF69_SPI_CS   8
+//#define RF69_IRQ_PIN  7
+//#elif defined(ARDUINO_SAMD_FEATHER_M0)
+//#define RF69_RESET    4
+//#define RF69_SPI_CS   8
+//#define RF69_IRQ_PIN  3
+//#endif
+
+#define RF69_SPI_CS   6
+#define RF69_IRQ_PIN  33
 
 // Function Prototypes
 bool getMessage(char*& data, uint8_t& datalen);
@@ -62,7 +65,10 @@ const long sendInterval = 3000;
 char* data = nullptr;
 uint8_t datalen = 0;
 
+String targetID = ":91";
+
 void loop() {
+
   // Receive
   if (radio.receiveDone()) {
     getMessage(data, datalen);
@@ -71,6 +77,8 @@ void loop() {
     }
     delay(100);
   }
+
+  
 
   // Send
   // unsigned long currentMillis = millis();
@@ -88,16 +96,58 @@ void loop() {
 }
 
 bool getMessage(char*& data, uint8_t& datalen) {
+  //Resets values from previous allocation
   if (data != nullptr) {
     delete[] data;
     data = nullptr;
   }
   datalen = 0;
+
   if (radio.DATALEN > 0 && radio.DATA != nullptr) {
     datalen = radio.DATALEN;
     data = new char[datalen];
     memcpy(data, radio.DATA, datalen);
-    Serial.println("Received message '" + bufferToString(data, datalen) + "' of length " + String(datalen, DEC));
+    //Serial.println("Received message '" + bufferToString(data, datalen) + "' of length " + String(datalen, DEC));
+    
+
+    String message = data;
+    
+    int startIndex = message.indexOf(targetID);
+  if (startIndex != -1) {
+    // Find the position of the next space after the target ID
+    int endIndex = message.indexOf(' ', startIndex);
+    if (endIndex == -1) {
+      endIndex = message.length(); // If no space is found, set to end of message
+    }
+    String segment = message.substring(startIndex, endIndex);
+
+    Serial.println(segment);
+
+    // Parse the distance and heading values
+    int dIndex = segment.indexOf('D');
+    int hIndex = segment.indexOf('H');
+
+    if (dIndex != -1 && hIndex != -1) {
+      String distanceStr = segment.substring(dIndex + 1, hIndex);
+      String headingStr = segment.substring(hIndex + 1);
+
+      float distance = distanceStr.toFloat();
+      int heading = headingStr.toFloat();
+
+      // Output the extracted values
+      Serial.print("Robot ID: ");
+      Serial.println(targetID.substring(1)); // Remove the colon for display
+      Serial.print("Distance: ");
+      Serial.println(distance);
+      Serial.print("Heading: ");
+      Serial.println(heading);
+    } else {
+      Serial.println("Error: Invalid segment format.");
+    }
+  } else {
+    Serial.println("Target ID not found in message.");
+  }
+
   }
   return data != nullptr;
 }
