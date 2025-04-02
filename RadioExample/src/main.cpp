@@ -38,8 +38,7 @@
 #define RF69_IRQ_PIN  33
 
 // Function Prototypes
-bool getMessage(char*& data, uint8_t& datalen);
-String bufferToString(char* data, uint8_t datalen);
+void processIncomingMessage();
 
 RFM69 radio(RF69_SPI_CS, RF69_IRQ_PIN, false);
 
@@ -65,13 +64,14 @@ const long sendInterval = 3000;
 char* data = nullptr;
 uint8_t datalen = 0;
 
-String targetID = ":91";
+String targetID = ":90";
 
 void loop() {
 
   // Receive
   if (radio.receiveDone()) {
-    getMessage(data, datalen);
+    //getMessage(data, datalen);
+    processIncomingMessage();
     if (radio.ACKRequested()) {
       radio.sendACK(nullptr, 0); // Corrected ACK function call
     }
@@ -95,71 +95,46 @@ void loop() {
   // }
 }
 
-bool getMessage(char*& data, uint8_t& datalen) {
-  //Resets values from previous allocation
-  if (data != nullptr) {
-    delete[] data;
-    data = nullptr;
-  }
-  datalen = 0;
-
+void processIncomingMessage() {
   if (radio.DATALEN > 0 && radio.DATA != nullptr) {
-    datalen = radio.DATALEN;
-    data = new char[datalen];
-    memcpy(data, radio.DATA, datalen);
-    //Serial.println("Received message '" + bufferToString(data, datalen) + "' of length " + String(datalen, DEC));
-    
+    // Create a String from the incoming data
+    String message = String((char*)radio.DATA);
 
-    String message = data;
-    
+    // Find the target ID in the message
     int startIndex = message.indexOf(targetID);
-  if (startIndex != -1) {
-    // Find the position of the next space after the target ID
-    int endIndex = message.indexOf(' ', startIndex);
-    if (endIndex == -1) {
-      endIndex = message.length(); // If no space is found, set to end of message
-    }
-    String segment = message.substring(startIndex, endIndex);
+    if (startIndex != -1) {
+      // Find the position of the next space after the target ID
+      int endIndex = message.indexOf(' ', startIndex);
+      if (endIndex == -1) {
+        endIndex = message.length(); // If no space is found, set to end of message
+      }
+      String segment = message.substring(startIndex, endIndex);
 
-    Serial.println(segment);
+      Serial.println(segment);
 
-    // Parse the distance and heading values
-    int dIndex = segment.indexOf('D');
-    int hIndex = segment.indexOf('H');
+      // Parse the distance and heading values
+      int dIndex = segment.indexOf('D');
+      int hIndex = segment.indexOf('H');
 
-    if (dIndex != -1 && hIndex != -1) {
-      String distanceStr = segment.substring(dIndex + 1, hIndex);
-      String headingStr = segment.substring(hIndex + 1);
+      if (dIndex != -1 && hIndex != -1) {
+        String distanceStr = segment.substring(dIndex + 1, hIndex);
+        String headingStr = segment.substring(hIndex + 1);
 
-      float distance = distanceStr.toFloat();
-      int heading = headingStr.toFloat();
+        float distance = distanceStr.toFloat();
+        float heading = headingStr.toFloat();
 
-      // Output the extracted values
-      Serial.print("Robot ID: ");
-      Serial.println(targetID.substring(1)); // Remove the colon for display
-      Serial.print("Distance: ");
-      Serial.println(distance);
-      Serial.print("Heading: ");
-      Serial.println(heading);
+        // Output the extracted values
+        Serial.print("Robot ID: ");
+        Serial.println(targetID.substring(1)); // Remove the colon for display
+        Serial.print("Distance: ");
+        Serial.println(distance);
+        Serial.print("Heading: ");
+        Serial.println(heading);
+      } else {
+        Serial.println("Error: Invalid segment format.");
+      }
     } else {
-      Serial.println("Error: Invalid segment format.");
+      Serial.println("Target ID not found in message.");
     }
-  } else {
-    Serial.println("Target ID not found in message.");
   }
-
-  }
-  return data != nullptr;
-}
-
-String bufferToString(char* data, uint8_t datalen) {
-  bool all_ascii = true;
-  String result = "";
-  for (uint8_t i = 0; i < datalen; i++) all_ascii &= isAscii(data[i]);
-
-  for (uint8_t i = 0; i < datalen; i++) {
-    result += all_ascii ? String((char)data[i]) : (String(data[i] < 16 ? "0" : "") + String((uint8_t)data[i], HEX) + " ");
-  }
-
-  return result;
 }
