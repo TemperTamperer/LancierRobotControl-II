@@ -17,22 +17,22 @@ void radio::checkForMessages() {
 
 void radio::processIncomingMessage() {
     if (radioUnit.DATALEN > 0 && radioUnit.DATA != nullptr) {
-        String message = String((char*)radioUnit.DATA);
-        int startIndex = message.indexOf(targetID);
+        message = String((char*)radioUnit.DATA);
+        startIndex = message.indexOf(targetID);
         if (startIndex != -1) {
-            int endIndex = message.indexOf(' ', startIndex);
+            endIndex = message.indexOf(' ', startIndex);
             if (endIndex == -1) {
                 endIndex = message.length();
             }
-            String segment = message.substring(startIndex, endIndex);
-            int dIndex = segment.indexOf('D');
-            int hIndex = segment.indexOf('H');
+            segment = message.substring(startIndex, endIndex);
+            dIndex = segment.indexOf('D');
+            hIndex = segment.indexOf('H');
 
             if (dIndex != -1 && hIndex != -1) {
-                String distanceStr = segment.substring(dIndex + 1, hIndex);
-                String headingStr = segment.substring(hIndex + 1);
-                float distance = distanceStr.toFloat();
-                float heading = headingStr.toFloat();
+                distanceStr = segment.substring(dIndex + 1, hIndex);
+                headingStr = segment.substring(hIndex + 1);
+                distance = distanceStr.toFloat();
+                heading = headingStr.toFloat();
 
                 Serial.print("Robot ID: ");
                 Serial.println(targetID.substring(1));

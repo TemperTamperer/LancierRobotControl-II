@@ -17,6 +17,18 @@ private:
     uint8_t networkId;
     uint8_t frequency;
     String targetID;
+
+    // Member variables to store message processing data
+    String message;
+    String segment;
+    int startIndex;
+    int endIndex;
+    int dIndex;
+    int hIndex;
+    String distanceStr;
+    String headingStr;
+    float distance;
+    float heading;
 };
 
 #endif
