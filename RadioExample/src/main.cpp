@@ -29,11 +29,6 @@ void setup() {
   Serial.println("Setup complete");
 }
 
-// Main loop
-unsigned long previousMillis = 0;
-const long sendInterval = 3000;
-
-
 
 void loop() {
   // Receive
