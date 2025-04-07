@@ -17,36 +17,40 @@
 #define RF69_IRQ_PIN  33
 String targetID = ":90";
 
+float distance;
+float heading;
+
+String message;
+String segment;
+
+int dIndex;
+int hIndex;
+
+String distanceStr;
+String headingStr;
+
 void processIncomingMessage();
 
 RFM69 radio(RF69_SPI_CS, RF69_IRQ_PIN, false);
 
 void setup() {
-  Serial.begin(SERIAL_BAUD);
-
   // Initialize the radio
   radio.initialize(FREQUENCY, NODEID, NETWORKID);
-  Serial.println("Setup complete");
+  Serial.println("Radio initialized");
 }
-
-// Main loop
-unsigned long previousMillis = 0;
-const long sendInterval = 3000;
-
 
 
 void loop() {
   // Receive
   if (radio.receiveDone()) {
     processIncomingMessage();
-    delay(100);
   }
 }
 
 void processIncomingMessage() {
   if (radio.DATALEN > 0 && radio.DATA != nullptr) {
     // Create a String from the incoming data
-    String message = String((char*)radio.DATA);
+    message = String((char*)radio.DATA);
 
     // Find the target ID in the message
     int startIndex = message.indexOf(targetID);
@@ -56,21 +60,21 @@ void processIncomingMessage() {
       if (endIndex == -1) {
         endIndex = message.length(); // If no space is found, set to end of message
       }
-      String segment = message.substring(startIndex, endIndex);
+      segment = message.substring(startIndex, endIndex);
 
-      Serial.println(segment);
+      // Serial.println(segment);
 
       // Parse the distance and heading values
-      int dIndex = segment.indexOf('D');
-      int hIndex = segment.indexOf('H');
+      dIndex = segment.indexOf('D');
+      hIndex = segment.indexOf('H');
 
       if (dIndex != -1 && hIndex != -1) {
-        String distanceStr = segment.substring(dIndex + 1, hIndex);
-        String headingStr = segment.substring(hIndex + 1);
+        distanceStr = segment.substring(dIndex + 1, hIndex);
+        headingStr = segment.substring(hIndex + 1);
 
-        float distance = distanceStr.toFloat();
-        float heading = headingStr.toFloat();
-
+        distance = distanceStr.toFloat();
+        heading = headingStr.toFloat();
+        
         // Output the extracted values
         Serial.print("Robot ID: ");
         Serial.println(targetID.substring(1)); // Remove the colon for display
