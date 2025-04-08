@@ -50,15 +50,15 @@
 
 #include "src/radio.h"  
 
-
-#define NODEID        2    // The ID of this node (must be different for every node on network)
+#define MASTERNODEID  1    // ID of Raspberry pi
+#define NODEID        2
 #define NETWORKID     100  // The network ID
 #define FREQUENCY      RF69_433MHZ
 #define SERIAL_BAUD   57600
 #define RF69_SPI_CS   6
 #define RF69_IRQ_PIN  33
 
-radio Radio(RF69_SPI_CS, RF69_IRQ_PIN, NODEID, NETWORKID, FREQUENCY);
+radio Radio(RF69_SPI_CS, RF69_IRQ_PIN, NETWORKID, FREQUENCY, MASTERNODEID);
 
 // main heartbeat timer to service source data and control loop interval
 IntervalTimer hbTimer;

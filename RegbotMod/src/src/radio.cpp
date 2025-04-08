@@ -3,26 +3,29 @@
 #include "uencoder.h"
 #include "urobot.h"
 
-radio::radio(uint8_t csPin, uint8_t irqPin, uint8_t nodeId, uint8_t networkId, uint8_t frequency)
-    : radioUnit(csPin, irqPin, false), nodeId(nodeId), networkId(networkId), frequency(frequency) {}
+radio::radio(uint8_t csPin, uint8_t irqPin, uint8_t networkId, uint8_t frequency, uint8_t masterNodeId)
+    : radioUnit(csPin, irqPin, false), networkId(networkId), frequency(frequency), masterNodeId(masterNodeId) {}
 
 void radio::initialize() {
     Serial.begin(57600);
+    nodeId = robot.deviceID;
+    radioID = ":" + String(robot.deviceID);
     radioUnit.initialize(frequency, nodeId, networkId);
+    
     Serial.println("Radio initialized");
-    robotID = ":" + String(robot.deviceID);
 }
 
 void radio::checkForMessages() {
-    if (radioUnit.receiveDone()) {
-        processIncomingMessage();
-    }
+    sendMessage();
+    //if (radioUnit.receiveDone()) {
+    //    processIncomingMessage();
+    //}
 }
 
 void radio::processIncomingMessage() {
     if (radioUnit.DATALEN > 0 && radioUnit.DATA != nullptr) {
         message = String((char*)radioUnit.DATA);
-        startIndex = message.indexOf(robotID);
+        startIndex = message.indexOf(radioID);
         if (startIndex != -1) {
             endIndex = message.indexOf(' ', startIndex);
             if (endIndex == -1) {
@@ -47,7 +50,7 @@ void radio::processIncomingMessage() {
                 control.ctrl_turn_ref = heading;
                
                 Serial.print("Robot ID: ");
-                Serial.println(robotID.substring(1));
+                Serial.println(radioID.substring(1));
                 Serial.print("Distance: ");
                 Serial.println(distance);
                 Serial.print("Heading: ");
@@ -61,3 +64,14 @@ void radio::processIncomingMessage() {
         }
     }
 }
+
+void radio::sendMessage() {
+
+    Serial.println("Sending");
+    char payload[] = "hello from test node";
+    if (radioUnit.sendWithRetry(1, payload, sizeof(payload), 3, 200)) {
+      Serial.println("ACK received");
+    } else {
+      Serial.println("No ACK");
+    }
+  }

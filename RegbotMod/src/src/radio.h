@@ -7,9 +7,10 @@
 
 class radio {
 public:
-    radio(uint8_t csPin, uint8_t irqPin, uint8_t nodeId, uint8_t networkId, uint8_t frequency);
+    radio(uint8_t csPin, uint8_t irqPin, uint8_t networkId, uint8_t frequency, uint8_t masterNodeId);
     void initialize();
     void checkForMessages();
+    void sendMessage();
 
 private:
     void processIncomingMessage();
@@ -17,7 +18,8 @@ private:
     uint8_t nodeId;
     uint8_t networkId;
     uint8_t frequency;
-    String robotID;
+    uint8_t masterNodeId;
+    String radioID;
 
     // Member variables to store message processing data
     String message;
