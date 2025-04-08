@@ -115,7 +115,7 @@ void setup()   // INITIALIZATION
 
   //TEMP for radio debugging
   Serial.begin(SERIAL_BAUD);
-
+  
   // Initialize the radio
   Radio.initialize();
 }

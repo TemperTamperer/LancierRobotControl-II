@@ -163,7 +163,8 @@ public:
   float mission_pos_ref;    // should position regulator be used
   float misStartDist;         // start distance for this line
   bool balance_active;
-  bool regul_line_use;  // use heading control from line sensor
+  bool regul_line_use; 
+  float ctrl_turn_ref;  // use heading control from line sensor
   // debug values for controller
 //   float regVelELeft[];
 //   float regVelUILeft[];
@@ -184,8 +185,7 @@ private:
   /// other than those set by mission
 //   float vel_ref_add_wall; // 0=left 1=right 
   float vel_ref_red_turn[2]; // 0=left 1=right
-  float ctrl_vel_ref; // velocity ref for position control
-  float ctrl_turn_ref; // turn ref used in for control input
+  float ctrl_vel_ref; // velocity ref for position control// turn ref used in for control input
   float balanceTiltRef; // reference tilt to balance regulator (from balance velocity)
   float balanceVelRef; // reference velocity as determined by balance controller
   /** rate limited wheel velocity - except for balance */

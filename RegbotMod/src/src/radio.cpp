@@ -1,12 +1,16 @@
 #include "radio.h"
+#include "ucontrol.h"
+#include "uencoder.h"
+#include "urobot.h"
 
 radio::radio(uint8_t csPin, uint8_t irqPin, uint8_t nodeId, uint8_t networkId, uint8_t frequency)
-    : radioUnit(csPin, irqPin, false), nodeId(nodeId), networkId(networkId), frequency(frequency), targetID(":90") {}
+    : radioUnit(csPin, irqPin, false), nodeId(nodeId), networkId(networkId), frequency(frequency) {}
 
 void radio::initialize() {
     Serial.begin(57600);
     radioUnit.initialize(frequency, nodeId, networkId);
     Serial.println("Radio initialized");
+    robotID = ":" + String(robot.deviceID);
 }
 
 void radio::checkForMessages() {
@@ -18,7 +22,7 @@ void radio::checkForMessages() {
 void radio::processIncomingMessage() {
     if (radioUnit.DATALEN > 0 && radioUnit.DATA != nullptr) {
         message = String((char*)radioUnit.DATA);
-        startIndex = message.indexOf(targetID);
+        startIndex = message.indexOf(robotID);
         if (startIndex != -1) {
             endIndex = message.indexOf(' ', startIndex);
             if (endIndex == -1) {
@@ -34,12 +38,21 @@ void radio::processIncomingMessage() {
                 distance = distanceStr.toFloat();
                 heading = headingStr.toFloat();
 
+                //Resets robots distance travled and heading angle 
+                encoder.distance = 0;
+                encoder.pose[2] = 0;
+                
+                //Assigns recived values to reference values for controllers
+                control.mission_pos_ref = distance;
+                control.ctrl_turn_ref = heading;
+               
                 Serial.print("Robot ID: ");
-                Serial.println(targetID.substring(1));
+                Serial.println(robotID.substring(1));
                 Serial.print("Distance: ");
                 Serial.println(distance);
                 Serial.print("Heading: ");
                 Serial.println(heading);
+
             } else {
                 Serial.println("Error: Invalid segment format.");
             }
