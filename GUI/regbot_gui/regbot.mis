@@ -1,5 +1,5 @@
 log = 5 : time = 0.1
-bal=1, vel=0: time = 1
-vel=0.5 : dist= 1
-bal = 1, vel=0 : time = 2
-bal=0, vel=0
+vel = 0, bal = 1 : time = 1
+vel=0.5,topos=1 : time=5
+vel=0.5,topos=-1 : time=5
+vel = 0, bal = 0 : time = 1 

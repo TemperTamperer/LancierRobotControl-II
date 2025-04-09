@@ -129,6 +129,13 @@ int debugSaved = 0;
 void loop ( void )
 {
   control.resetControl();
+  control.controlActive = true;
+  control.mission_vel_ref = 0.3;
+  control.balance_active = true;
+  control.mission_pos_use = true;
+  
+  //control.mission_turn_do = false;
+
   bool cycleStarted = false;
   robot.setStatusLed(LOW);
   // - listen for incoming commands

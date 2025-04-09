@@ -16,10 +16,9 @@ void radio::initialize() {
 }
 
 void radio::checkForMessages() {
-    sendMessage();
-    //if (radioUnit.receiveDone()) {
-    //    processIncomingMessage();
-    //}
+    if (radioUnit.receiveDone()) {
+        processIncomingMessage();
+    }
 }
 
 void radio::processIncomingMessage() {
@@ -44,6 +43,12 @@ void radio::processIncomingMessage() {
                 //Resets robots distance travled and heading angle 
                 encoder.distance = 0;
                 encoder.pose[2] = 0;
+
+                //Reset Robot x and y position and set 
+                //the reference start position for velocity controller
+                //encoder.pose[0] = 0;
+                //encoder.pose[1] = 0;
+                
                 
                 //Assigns recived values to reference values for controllers
                 control.mission_pos_ref = distance;
