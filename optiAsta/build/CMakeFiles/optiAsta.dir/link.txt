@@ -1,0 +1,1 @@
+/usr/bin/c++  -std=c++11 -Wall -rdynamic CMakeFiles/optiAsta.dir/main.cpp.o CMakeFiles/optiAsta.dir/optidata.cpp.o CMakeFiles/optiAsta.dir/PacketClient.cpp.o -o optiAsta  -lpthread 

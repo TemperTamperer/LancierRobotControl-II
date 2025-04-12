@@ -1,0 +1,3 @@
+/home/local/optiAsta/build/CMakeFiles/optiAsta.dir
+/home/local/optiAsta/build/CMakeFiles/edit_cache.dir
+/home/local/optiAsta/build/CMakeFiles/rebuild_cache.dir
