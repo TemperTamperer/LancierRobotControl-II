@@ -38,7 +38,8 @@ void radio::processIncomingMessage() {
                 distanceStr = segment.substring(dIndex + 1, hIndex);
                 headingStr = segment.substring(hIndex + 1);
                 distance = distanceStr.toFloat();
-                heading = headingStr.toFloat();
+                headingDegrees = headingStr.toFloat();
+                headingRads = (headingDegrees * 3.14/180);
 
                 //Resets robots distance travled and heading angle 
                 encoder.distance = 0;
@@ -52,14 +53,14 @@ void radio::processIncomingMessage() {
                 
                 //Assigns recived values to reference values for controllers
                 control.mission_pos_ref = distance;
-                control.ctrl_turn_ref = heading;
+                control.ctrl_turn_ref = headingRads;
                
                 Serial.print("Robot ID: ");
                 Serial.println(radioID.substring(1));
                 Serial.print("Distance: ");
                 Serial.println(distance);
                 Serial.print("Heading: ");
-                Serial.println(heading);
+                Serial.println(headingDegrees);
 
             } else {
                 Serial.println("Error: Invalid segment format.");

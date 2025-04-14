@@ -31,7 +31,8 @@ private:
     String distanceStr;
     String headingStr;
     float distance;
-    float heading;
+    float headingDegrees;
+    float headingRads;
 };
 
 #endif

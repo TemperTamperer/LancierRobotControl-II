@@ -1,4 +1,4 @@
-/***************************************************************************
+  /***************************************************************************
 *   Copyright (C) 2019-2024 by DTU                             *
 *   jcan@dtu.dk                                                *
 *
@@ -134,7 +134,9 @@ void loop ( void )
   control.balance_active = true;
   control.mission_pos_use = true;
   
-  //control.mission_turn_do = false;
+  control.mission_turn_do = false;
+  control.regul_line_use = false;
+  control.mission_wall_turn = false;
 
   bool cycleStarted = false;
   robot.setStatusLed(LOW);
@@ -149,6 +151,7 @@ void loop ( void )
 
     //Checks if radio message is received and handles incoming data
     Radio.checkForMessages();
+    
 
     usb.tick(); // service commands from USB
     // startNewCycle is set by 10us timer interrupt every 1 ms
@@ -156,6 +159,10 @@ void loop ( void )
     { // error detect
       startNewCycle = false;
       cycleStarted = true;
+
+        //Serial.println(control.ctrl_turn_ref);
+        Serial.println(encoder.pose[2]);
+      
       // AD converter should start as soon as possible, to also get a reading at half time
       // values are not assumed to change faster than this
       ad.tick();

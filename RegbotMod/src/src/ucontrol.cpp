@@ -646,7 +646,7 @@ void UControl::tick(void)
 //       usb.send(s);
 //     }
     // use turn ref as is in most cases
-    ctrl_turn_ref = mission_turn_ref;
+    //ctrl_turn_ref = mission_turn_ref;
     if (chirpRun)
     { // we are using chirps, so calculate current addition to control value
       // amplitude limitation
