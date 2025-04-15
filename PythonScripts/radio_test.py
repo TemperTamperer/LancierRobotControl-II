@@ -40,21 +40,18 @@ from dancer import Dancer
 
 nodeId = 1
 networkId = 100
-recipientId = 0
+recipientId = 0 #recipient 0 sends to all nodes on network
 board = {'isHighPower': True, 'interruptPin': 15, 'resetPin': 31}
 FIFO_PATH = "/tmp/optitrack_data"
 
 dancer1 = Dancer(90)
 
-initToggle = False
-
 currentMessage = ""
-lastOptiData = ""
 
 commandFlag = False
 printToggle = False
 beginFlag = False
-
+danceFlag = False
 
 def help():
     print("Command list")
@@ -67,81 +64,78 @@ def help():
     print("     maxvel f - Sets the maximum velocity to given float (default 0.5)") 
     #print("     bat - Pings all dancers about their radio status and wait for response to be displayed")
 
-def initDancers(data):
+def initDancers():
     global dancers
     
     dancers = []
-    dancerCount = 0
+
+    data = receiveOptiData()
+
     pattern = r":(\d+)X(-?\d+\.\d+)Y(-?\d+\.\d+)H(-?\d+\.\d+)"
     matches = re.findall(pattern, data)
     
     for match in matches:
         dancer = Dancer(int(match[0]))
-        dancer.updatePose(data)
         dancers.append(dancer)
-        dancerCount += 1
         print(dancer)
     
-    print("Optitrack sees " + str(dancerCount) + " rigid bodies")
-    print(str(len(dancers)) + " dancer objects have been created with Optitrack id's")
-        
+    updateDancersPose(data)
+    print("Optitrack sees " + str(len(dancers)) + " rigid bodies and dancer objects have been created with Optitrack ID's")
             
-        
-        
+def receiveOptiData():
+    with open(FIFO_PATH, 'r') as fifo:
+        print("receiveOptiData funciton called")
+        data = fifo.readline().strip()
+    return data      
+
+def updateDancersPose(data):
+    global dancers
+
+    for i in dancers:
+        dancers[i].updatePose(data)
+
+def extractDancePath():
     
 
-def sendMessage(radio, recipientId):
+
+def sendMessage(radio):
     global currentMessage
     global commandFlag
     global printToggle
-    global lastOptiData
+    global recipientId
+    global dancers
     
-    """
     while True:
-        #print ("Sending")
+        currentMessage = ""
+        lastOptiData = receiveOptiData()
+        if lastOptiData: #true if anything was in the pipe
+            updateDancersPose(lastOptiData)
+            for i in dancers:
+                target = [-4 ,4]
+                dancers[i].updateTarget(target)
+                currentMessage += dancers[i].poseToTarget()
+        print(currentMessage)
+        radio.send(recipientId, currentMessage, attempts=1, waitTime=1, require_ack=False)
+                
         if commandFlag == True:
             if printToggle:
                 print (currentMessage)
-            if radio.send(recipientId, currentMessage, attempts=100, waitTime=100, require_ack=True):
+            if radio.send(recipientId, currentMessage, attempts=10, waitTime=100, require_ack=True):
                 print ("Acknowledgement received")
             commandFlag = False
-                
-    """
-    
-    with open(FIFO_PATH, 'r') as fifo: 
-        print("fifo Initilzed")
-        while True:
-            lastOptiData = fifo.readline().strip()  # Blocks until data arrives
-            if lastOptiData:
-                dancer1.updatePose(lastOptiData)
-                target = [-4 ,4]
-                dancer1.updateTarget(target)
-                currentMessage = dancer1.poseToTarget()
-                print(currentMessage)
-                radio.send(recipientId, currentMessage, attempts=1, waitTime=1, require_ack=False)
-                time.sleep(0)
-                initDancers(lastOptiData)
-                #print(dancer1)
-                #print(f"Received from OptiTrack: {lastOptiData}")  # Print raw data
-                #print();
-                    
-            #print ("Sending")
-            if commandFlag == True:
-                if printToggle:
-                    print (currentMessage)
-                if radio.send(recipientId, currentMessage, attempts=10, waitTime=100, require_ack=True):
-                    print ("Acknowledgement received")
-                commandFlag = False
     
         
 def inputCommand():
     global currentMessage
     global commandFlag
     global printToggle
+    global danceFlag
     while True:
         newCommand = input("Enter command (help: for list of commands): ")
         if newCommand.casefold() == "help".casefold():
             help()
+        elif newCommand.casefold() == "init".casefold():
+            initDancers()
         elif newCommand.casefold() == "print".casefold():
             printToggle = not printToggle
         elif newCommand.casefold() == "stop".casefold():
@@ -150,6 +144,8 @@ def inputCommand():
         elif newCommand.casefold() == "start".casefold():
             currentMessage = "start"
             commandFlag = True
+        elif newCommand.casefold() == "dance".casefold():
+            danceFlag = True
         else:
             currentMessage = '"' + newCommand + '"'
             commandFlag = True
