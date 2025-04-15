@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   width="200"
+   height="200"
+   viewBox="0 0 200 200"
+   id="svg113"
+   sodipodi:docname="star.svg"
+   inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs117" />
+  <sodipodi:namedview
+     id="namedview115"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="3.0345619"
+     inkscape:cx="80.901299"
+     inkscape:cy="103.30981"
+     inkscape:window-width="1512"
+     inkscape:window-height="917"
+     inkscape:window-x="0"
+     inkscape:window-y="65"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg113" />
+  <path
+     stroke="#ff0000"
+     d="m 100.28226,194.84992 30.61336,-62.30593 68.45721,-9.99132 L 149.81623,74.053176 161.51157,5.5792763 100.28226,37.90477 39.053798,5.5792763 50.749556,74.053176 1.2125586,122.55267 69.670175,132.54399 Z"
+     id="path109"
+     style="fill:none;stroke-width:0.431795" />
+  <path
+     stroke="#00ff00"
+     d="M 99.347526,5.5792743 129.9609,67.885196 198.4181,77.876513 148.88151,126.37601 160.57685,194.84992 99.347526,162.52441 38.119085,194.84992 49.814835,126.37601 0.27783789,77.876513 68.735458,67.885196 Z"
+     id="path111"
+     style="fill:none;fill-opacity:1;stroke-width:0.431795" />
+  <path
+     stroke="#0000ff"
+     d="m 6.0123386,100.00512 62.0319884,30.74854 9.947379,68.75953 48.286264,-49.75535 68.17284,11.74697 L 162.26743,100.00512 194.45081,38.506264 126.27797,50.253677 77.991706,0.49790548 68.044327,69.257846 Z"
+     id="path109-7"
+     style="fill:none;stroke-width:0.431795" />
+  <path
+     stroke="#ffff00"
+     d="M 194.13406,99.952096 132.10208,69.203546 122.15469,0.44400868 73.86844,50.199357 5.6955978,38.452393 37.878969,99.952096 5.6955911,161.45094 73.86844,149.70355 l 48.28625,49.75576 9.94739,-68.75995 z"
+     id="path109-7-9"
+     style="fill:none;stroke-width:0.431795"
+     inkscape:transform-center-x="0.046510127"
+     inkscape:transform-center-y="7.5163524" />
+</svg>
