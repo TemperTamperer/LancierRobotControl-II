@@ -6,15 +6,20 @@ import queue
 import os
 import re
 from dancer import Dancer
-import generateRobotPath
+from generateRobotPath import print_test
 
-nodeId = 1
-networkId = 100
+nodeId = 1 #1 should be reserved for RPi
+networkId = 100 #arbitary as long as consistent with dancers
 recipientId = 0 #recipient 0 sends to all nodes on network
 board = {'isHighPower': True, 'interruptPin': 15, 'resetPin': 31}
 FIFO_PATH = "/tmp/optitrack_data"
 
+dancers = []
 dancer1 = Dancer(90)
+
+route = [[]]
+stopPoints = [] 
+orientationVectors = []
 
 currentMessage = ""
 
@@ -26,7 +31,7 @@ danceFlag = False
 def help():
     print("Command list")
     print("     :idDdistHhead - Position commad - example: :90D0.5H10 (ping id 90, 0.5 m forward, 10 degrees to right)")
-    print("     generate /path - generates path from given svg file. Ex: generate SvgTest/lancier.svg")
+    print("     generate /path - generates path from given svg file. Ex: generate 'SVG/Sine.svg'")
     print("     begin - Starts the dance given in svg file")
     print("     stop - Stops movement of all dancers and waits for start signal")  
     print("     start - Resumes normal function after stop call")
@@ -65,6 +70,23 @@ def updateDancersPose(data):
     for i in dancers:
         dancers[i].updatePose(data)
 
+def generatePath(svgFilePath):
+    global dancers
+    route, stopPoints, orientationVectors = print_test(svgFilePath)
+    for i in dancers:
+        dancers[i].initPath(route[i])
+
+def updateDancersTarget():
+    global dancers
+    for i in dancers:
+        dancers[i].nextTarget()
+
+def dancersToTarget():
+    global dancers
+    global currentMessage
+    for i in dancers:
+        currentMessage += dancers[i].poseToTarget()
+
 def sendMessage(radio):
     global currentMessage
     global commandFlag
@@ -77,14 +99,11 @@ def sendMessage(radio):
         lastOptiData = receiveOptiData()
         if lastOptiData: #true if anything was in the pipe
             updateDancersPose(lastOptiData)
-            for i in dancers:
-                target = [-4 ,4]
-                dancers[i].updateTarget(target)
-                currentMessage += dancers[i].poseToTarget()
-        print(currentMessage)
-        radio.send(recipientId, currentMessage, attempts=1, waitTime=1, require_ack=False)
-                
-        if commandFlag == True:
+            updateDancersTarget()
+            dancersToTarget()
+            print(currentMessage)
+            radio.send(recipientId, currentMessage, attempts=1, waitTime=1, require_ack=False)       
+        elif commandFlag == True:
             if printToggle:
                 print (currentMessage)
             if radio.send(recipientId, currentMessage, attempts=10, waitTime=100, require_ack=True):
@@ -103,6 +122,8 @@ def inputCommand():
             help()
         elif newCommand.casefold() == "init".casefold():
             initDancers()
+        elif newCommand.find("generate"):
+            generatePath(newCommand.split()[1])
         elif newCommand.casefold() == "print".casefold():
             printToggle = not printToggle
         elif newCommand.casefold() == "stop".casefold():

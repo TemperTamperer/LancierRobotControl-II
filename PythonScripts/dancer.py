@@ -12,6 +12,8 @@ class Dancer:
 		self.pose = [0.0, 0.0, 0.0]  # x, y, h coordinates and angle of robot
 		self.heading = 0 # angle in degrees
 		self.targetPos = [0.0, 0.0] # x, y coordinates of target
+		self.pathArr = []
+		self.step = 0
 
 	def updatePose(self, data):
 		pattern = r":(\d+)X(-?\d+\.\d+)Y(-?\d+\.\d+)H(-?\d+\.\d+)"
@@ -23,10 +25,14 @@ class Dancer:
 				self.pose[0] = float(match[1])
 				self.pose[1] = float(match[2])
 				self.pose[2] = float(match[3])
-				
-	def updateTarget(self, target):
-		self.targetPos = target
-		
+
+	def initPath(self, path):
+		self.pathArr = path
+
+	def nextTarget(self):
+		self.step = self.step + 1
+		if self.step < len(self.pathArr):
+			self.targetPos = self.pathArr[self.step]
 
 	def __str__(self):
 		return f"Robot {self.robotId}: Pose: {self.pose}"

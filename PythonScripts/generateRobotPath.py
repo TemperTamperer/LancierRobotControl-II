@@ -105,6 +105,8 @@ def print_test(test_svg):
     plt.xlabel('x-axis')
     plt.ylabel('y-axis')
     plt.show()
+
+    return route, stop, orientation
 def main():
     # Printes the generated plot
     print_test("SvgTest/Sine.svg")
