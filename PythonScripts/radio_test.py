@@ -1,34 +1,3 @@
-"""
-import time
-import lgpio as GPIO
-from RFM69 import Radio, FREQ_315MHZ, FREQ_433MHZ, FREQ_868MHZ, FREQ_915MHZ
-import queue
-
-
-node_id = 1
-network_id = 100
-recipient_id = 0
-board = {'isHighPower': True, 'interruptPin': 15, 'resetPin': 31}
-
-with Radio(FREQ_433MHZ, node_id, network_id, verbose=True, **board) as radio:
-    print ("Starting loop...")
-    time.sleep(10)
-    while True:
-        print ("Sending")
-        if radio.send(recipient_id, ":90D1H50 :91D1H50", attempts=3, waitTime=100, require_ack=True):
-            print ("Acknowledgement received")
-        else:
-            print ("No Acknowledgement")
-        
-        # print("recieveing")
-        # packet = radio.get_packet()
-        # if packet:
-            # print(f"Received packet from node {packet.sender}: {packet.message}")
-        # else:
-            # print("Nothing was received")
-	 
-"""        
-
 import threading
 import time
 import lgpio as GPIO
@@ -37,6 +6,7 @@ import queue
 import os
 import re
 from dancer import Dancer
+import generateRobotPath
 
 nodeId = 1
 networkId = 100
@@ -56,6 +26,7 @@ danceFlag = False
 def help():
     print("Command list")
     print("     :idDdistHhead - Position commad - example: :90D0.5H10 (ping id 90, 0.5 m forward, 10 degrees to right)")
+    print("     generate /path - generates path from given svg file. Ex: generate SvgTest/lancier.svg")
     print("     begin - Starts the dance given in svg file")
     print("     stop - Stops movement of all dancers and waits for start signal")  
     print("     start - Resumes normal function after stop call")
@@ -93,10 +64,6 @@ def updateDancersPose(data):
 
     for i in dancers:
         dancers[i].updatePose(data)
-
-def extractDancePath():
-    
-
 
 def sendMessage(radio):
     global currentMessage
@@ -174,64 +141,3 @@ def main():
         
 if __name__ == "__main__":
     main()
-
-
-
-        
-        
-        
-        
-"""       
-        
-# pylint: disable=missing-function-docstring,redefined-outer-name
-import time
-import lgpio as GPIO
-import asyncio
-from aiohttp import ClientSession
-from RFM69 import Radio, FREQ_433MHZ
-
-async def call_API(url, packet):
-    async with ClientSession() as session:
-        print("Sending packet to server")
-        async with session.post(url, json=packet.to_dict('%c')) as response:
-            response = await response.read()
-            print("Server responded", response)
-
-async def receiver(radio):
-    while True:
-        print("Receiver")
-        for packet in radio.get_packets():
-            print("Packet received", packet.to_dict())
-            await call_API("http://httpbin.org/post", packet)
-        await asyncio.sleep(10)
-
-async def send(radio, to, message):
-    print ("Sending")
-    if radio.send(to, message, attempts=3, waitTime=100):
-        print ("Acknowledgement received")
-    else:
-        print ("No Acknowledgement")
-
-async def pinger(radio):
-    print("Pinger")
-    counter = 0
-    while True:
-        await send(radio, 2, "ping {}".format(counter))
-        counter += 1
-        await asyncio.sleep(5)
-
-
-loop = asyncio.get_event_loop()
-node_id = 1
-network_id = 100
-recipient_id = 2
-board = {'isHighPower': True, 'interruptPin': 40, 'resetPin': 31}
-
-with Radio(FREQ_433MHZ, node_id, network_id, verbose=True, **board) as radio:
-    print ("Started radio")
-    loop.create_task(receiver(radio))
-    loop.create_task(pinger(radio))
-    loop.run_forever()
-
-loop.close()
-"""

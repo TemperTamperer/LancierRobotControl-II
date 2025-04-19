@@ -5,7 +5,6 @@ from svgpathtools import parse_path
 from xml.dom import minidom
 from matplotlib import pyplot as plt
 from cycler import cycler
-from svg_parser import pointsFromDoc
 
 color_dict = { '#ff0000' : 0, '#0000ff' : 1, '#ffff00' : 2, '#00ff00' : 3, 'orange' : 4, 'indigo' : 5, 'teal' : 6, 'steelblue' : 7}
 
@@ -84,7 +83,7 @@ def print_test(test_svg):
         # Read the contents of the file into a string variable
         svg_path = f.read()
     doc = minidom.parseString(svg_path)
-    route, stop, orientation= pointsFromDoc(doc,density=1 , scale=1)
+    route, stop, orientation= pointsFromDoc(doc,density=0.5 , scale=1)
     print(route)
     print()
     print(stop)
@@ -108,7 +107,7 @@ def print_test(test_svg):
     plt.show()
 def main():
     # Printes the generated plot
-    print_test("SvgTest/Untitled(8).svg")
+    print_test("SvgTest/Sine.svg")
 
 if __name__ == "__main__":
     main()

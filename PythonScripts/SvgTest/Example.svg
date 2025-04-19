@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg 
+  version="1.1"
+   width="800"
+   height="400"
+   id="svg2"
+   sodipodi:docname="heart.svg"
+   inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview14"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="true"
+     inkscape:zoom="0.98253938"
+     inkscape:cx="339.4266"
+     inkscape:cy="252.40719"
+     inkscape:window-width="1512"
+     inkscape:window-height="916"
+     inkscape:window-x="0"
+     inkscape:window-y="38"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2">
+    <inkscape:grid
+       type="xygrid"
+       id="grid789"
+       originx="0"
+       originy="0" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs8" />
+  <path 
+  stroke="#ff0000"
+  style="stroke: rgb(0, 0, 0);" 
+  d="M 322.632 259.098 L 140.83 258.443 L 323.211 259.022 L 140.389 258.424 L 323.781 259.093 L 322.399 232.612 L 140.502 231.43 L 323.369 232.626 L 139.831 231.402 L 139.052 211.188 L 321.367 212.524 L 138.384 211.077 L 137.606 189.602 L 318.807 191.772"
+  id="path4"
+  />
+  <path
+  stroke="#00ff00"
+   style="stroke: rgb(103, 255, 0);" 
+   d="M 315.423 170.494 L 137.992 170.856 L 137.448 128.585 C 137.448 128.585 317.056 132.213 316.874 132.213 C 316.692 132.213 312.158 101.735 312.158 101.735"
+   id="path2"
+   />
+</svg>
