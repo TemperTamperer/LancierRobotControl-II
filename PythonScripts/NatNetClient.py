@@ -3,6 +3,9 @@ import socket
 import struct
 from threading import Thread
 import coloredlogs, logging
+import sys
+logging.basicConfig(level=logging.INFO, stream=sys.stdout,
+                    format='%(asctime)s - %(message)s')
 
 
 # Create structs for reading various object types to speed up parsing.
@@ -14,7 +17,7 @@ DoubleValue = struct.Struct('<d')
 
 
 class NatNetClient:
-  def __init__(self, ver=(3, 0, 0, 0), server_ip="192.168.2.3", quiet=True):
+  def __init__(self, ver=(4, 0, 0, 0), server_ip="192.168.1.100", quiet=True):
     self.__natNetStreamVersion = ver
     self.serverIPAddress = server_ip
     self.multicastAddress = "239.255.42.99"
@@ -38,6 +41,7 @@ class NatNetClient:
   NAT_REQUEST_FRAMEOFDATA = 6
   NAT_FRAMEOFDATA = 7
   NAT_MESSAGESTRING = 8
+  NAT_CONNECT = 0
   NAT_DISCONNECT = 9
   NAT_UNRECOGNIZED_REQUEST = 100
 
@@ -447,6 +451,17 @@ class NatNetClient:
 
   # ================================ Threads ================================ #
   def __processMessage(self, data):
+    if len(data) < 4:
+        return  # ← Add this guard clause
+    
+    # Add packet length validation:
+    packetSize = int.from_bytes(data[2:4], byteorder='little')
+    if len(data) < packetSize + 4:
+        logging.error("Truncated packet! Expected {} bytes, got {}".format(
+            packetSize+4, len(data)))
+        return
+    
+    
     logging.info("\n------------\nBegin Packet")
 
     messageID = int.from_bytes(data[0:2], byteorder='little')
@@ -509,21 +524,18 @@ class NatNetClient:
     result.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     # A hacky way to get the IP of the interface that connects to the Internet
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    my_ip = s.getsockname()[0]
-    s.close()
-    # Specify my_ip as the interface to subscribe to multicast through
-    result.setsockopt(socket.SOL_IP, socket.IP_ADD_MEMBERSHIP,
-                      socket.inet_aton(self.multicastAddress)
-                      + socket.inet_aton(my_ip))
+    mreq = struct.pack("4s4s", 
+                  socket.inet_aton(self.multicastAddress),
+                  socket.inet_aton('0.0.0.0'))
+    result.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
 
     # # Original way of signing up for multicast
     # mreq = struct.pack("4sl", socket.inet_aton(self.multicastAddress),
     #                    socket.INADDR_ANY)
     # result.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-    result.bind((self.multicastAddress, port))
+    result.bind(('0.0.0.0', port))
     return result
 
   def __createCommandSocket(self):
@@ -535,13 +547,13 @@ class NatNetClient:
 
   # ================================= Main ================================== #
   def sendCommand(self, command, commandStr, socket, address):
+    data = b''
     packetSize = 0
     if command == self.NAT_REQUEST:
       packetSize = len(commandStr) + 1
-
-    data = command.to_bytes(2, byteorder='little')
+      
+    data += command.to_bytes(2, byteorder='little')
     data += packetSize.to_bytes(2, byteorder='little')
-
     data += commandStr.encode('utf-8')
     data += b'\0'
 
@@ -570,7 +582,22 @@ class NatNetClient:
     # self.sendCommand(self.NAT_REQUEST_MODELDEF, "", self.commandSocket,
     #                  (self.serverIPAddress, self.commandPort))
     # time.sleep(0.1)
+    
+    commandThread.start()
     dataThread.start()
+    self.sendCommand(self.NAT_CONNECT, "", self.commandSocket,
+                (self.serverIPAddress, self.commandPort))
+    time.sleep(0.1)
+
+    # Request model definitions
+    self.sendCommand(self.NAT_REQUEST_MODELDEF, "", self.commandSocket,
+                (self.serverIPAddress, self.commandPort))
+    time.sleep(0.1)
+    
+    # Send initial ping to get server version
+    self.sendCommand(self.NAT_PING, "", self.commandSocket,
+                (self.serverIPAddress, self.commandPort))
+    time.sleep(0.1)
 
 
 if __name__ == "__main__":
@@ -586,7 +613,7 @@ if __name__ == "__main__":
     print("--Received rigid body {}".format(position))
     print("--Received rigid body {}".format(rotation))
   # Optitrack client
-  streamingClient = NatNetClient(ver=(3, 0, 0, 0), quiet=False)
+  streamingClient = NatNetClient(ver=(4, 0, 0, 0), quiet=False)
   # streamingClient.newFrameListener = receiveNewFrame
   streamingClient.rigidBodyListener = receiveRigidBodyFrame
   streamingClient.run()
