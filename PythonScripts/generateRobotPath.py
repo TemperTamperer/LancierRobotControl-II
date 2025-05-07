@@ -83,7 +83,7 @@ def print_test(test_svg):
         # Read the contents of the file into a string variable
         svg_path = f.read()
     doc = minidom.parseString(svg_path)
-    route, stop, orientation= pointsFromDoc(doc,density=0.5 , scale=1)
+    route, stop, orientation= pointsFromDoc(doc,density=0.3 , scale=1.92)
     print(route)
     print()
     print(stop)
@@ -109,7 +109,7 @@ def print_test(test_svg):
     return route, stop, orientation
 def main():
     # Printes the generated plot
-    print_test("SvgTest/Sine.svg")
+    print_test("SVG/sym.svg")
 
 if __name__ == "__main__":
     main()
