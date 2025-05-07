@@ -289,9 +289,7 @@ void Unpack(char *pData) {
     memcpy(&nRigidBodies, ptr, 4);
     ptr += 4;
     printf("Rigid Body Count : %d\n", nRigidBodies);
-    
-    //Send data through FIFO pipe
-    
+
     
     // Read and discard any existing data in the FIFO
     int FIFOpipe = open(fifoPath, O_RDONLY | O_NONBLOCK);
@@ -306,8 +304,7 @@ void Unpack(char *pData) {
     std::cout << "FIFO cleared." << std::endl;
     
     // Write to FIFO
-    
-    
+
     FIFOpipe = open(fifoPath, O_WRONLY | O_NONBLOCK);
     if (FIFOpipe == -1) {
         perror("Error opening FIFO for clearing");
@@ -322,13 +319,8 @@ void Unpack(char *pData) {
         perror("Error writing to FIFO");
     } else {
       std::cout << "Successfully wrote " << bytes_written << " bytes to FIFO." << std::endl;
+      //close(FIFOpipe);
     }
-    //std::this_thread::sleep_for(std::chrono::seconds(1));
-    
-    //std::cout << "[C++] Sending: " << radioData << std::endl;
-    //FIFOpipe << radioData << std::endl;
-    //FIFOpipe.flush();
-
     
     radioData = "";
     for (int j = 0; j < nRigidBodies; j++) {
@@ -994,7 +986,7 @@ void Unpack(char *pData) {
 
 // Data listener thread. Listens for incoming bytes from NatNet
 static void *DataListenThread(void *dummy) {
-  char szData[2000];
+  char szData[MAX_PACKETSIZE];
   socklen_t addr_len = sizeof(struct sockaddr);
   sockaddr_in TheirAddress{};
   
